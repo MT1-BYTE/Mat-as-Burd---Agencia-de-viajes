@@ -19,6 +19,7 @@ function principal() {
     ]
 
     let carrito = recuperarCarritoDelStorage("carrito")
+    console.log("🚀 ~ principal ~ carrito:", carrito)
 
     renderizarCarrito(carrito)
 
@@ -43,6 +44,16 @@ function principal() {
 }
 
 principal()
+
+function calcularTotal(productos) {
+    return productos.reduce((acum, producto) => acum + producto.subtotal, 0)
+}
+
+function actualizarTotal(total) {
+    let elementoTotal = document.getElementById("total")
+    elementoTotal.innerText = "$" + total
+    
+}
 
 function finalizarCompra() {
     alert("Gracias por su compra")
@@ -76,8 +87,9 @@ function crearTarjetasProductos(productos) {
         tarjetaProducto.innerHTML = `
             <img src=./images/${producto.rutaImagen}>
             <h2>${producto.destino}</h2>
+            <p>USD ${producto.precio}</p>
             <p>${mensaje}</p>
-            <button class=botonAgregarAlCarrito id=${producto.id}>Agregar al carrito</button>
+            <button class=botonAgregarAlCarrito id=agc${producto.id}>Agregar al carrito</button>
 
         `
         contenedor.appendChild(tarjetaProducto)
@@ -86,7 +98,7 @@ function crearTarjetasProductos(productos) {
 
 function agregarProductoAlCarrito(event, productos) {
     let carrito = recuperarCarritoDelStorage()
-    let id = Number(event.target.id)
+    let id = Number(event.target.id.substring(3))
     let productoOriginal = productos.find(producto => producto.id === id)
     let indiceProductoEnCarrito = carrito.findIndex(producto => producto.id === id)
     if (indiceProductoEnCarrito === -1) {
@@ -102,7 +114,7 @@ function agregarProductoAlCarrito(event, productos) {
         carrito[indiceProductoEnCarrito].subtotal = carrito[indiceProductoEnCarrito].precioUnitario * carrito[indiceProductoEnCarrito].unidades
     }  
 
-    guardarEnStorage("carrito", carrito)
+    guardarEnStorage(carrito)
 
     renderizarCarrito(carrito)
 }
@@ -114,16 +126,93 @@ function renderizarCarrito(carrito) {
     carrito.forEach(producto => {
         let tarjetaCarrito = document.createElement("div")
         tarjetaCarrito.className = "tarjetaCarrito"
+        tarjetaCarrito.id = "tca" + producto.id
         
         tarjetaCarrito.innerHTML = `
             <p>${producto.nombre}</p>
             <p>${producto.precioUnitario}</p>
-            <p>${producto.unidades}</p>
+            <div class=unidades>
+                <button id=run${producto.id}>-</button>
+                <p>${producto.unidades}</p>
+                <button id=sun${producto.id}>+</button>
+            </div>
             <p>${producto.subtotal}</p>
-            <button>Eliminar</button>
+            <button id=eli${producto.id}>Eliminar</button>
         `
         contenedorCarrito.appendChild(tarjetaCarrito)
+
+        let botonEliminar = document.getElementById("eli" + producto.id)
+        botonEliminar.addEventListener("click", eliminarProductoDelCarrito)
+
+        let botonRestarUnidad = document.getElementById("run" + producto.id)
+        botonRestarUnidad.addEventListener("click", restarUnidadProdCarrito)
+
+        let botonSumarUnidad = document.getElementById("sun" + producto.id)
+        botonSumarUnidad.addEventListener("click", sumarUnidadProdCarrito)
     })
+
+    let total = calcularTotal(carrito)
+    actualizarTotal(total)
+}
+
+function sumarUnidadProdCarrito(e) {
+    let id = Number(e.target.id.substring(3))
+    let carrito = recuperarCarritoDelStorage()
+    let indiceProducto = carrito.findIndex(producto => producto.id === id)
+
+    if (indiceProducto !== -1) {
+        carrito[indiceProducto].unidades++
+        carrito[indiceProducto].subtotal = carrito[indiceProducto].precioUnitario * carrito[indiceProducto].unidades
+        guardarEnStorage(carrito) 
+
+        e.target.previousElementSibling.innerText = carrito[indiceProducto].unidades
+        e.target.parentElement.nextElementSibling.innerText = carrito[indiceProducto].subtotal
+    }
+
+    const total = calcularTotal(carrito)
+    actualizarTotal(total)
+}
+
+function restarUnidadProdCarrito(e) {
+    let id = Number(e.target.id.substring(3))
+    let carrito = recuperarCarritoDelStorage()
+    let indiceProducto = carrito.findIndex(producto => producto.id === id)
+
+    if (indiceProducto !== -1) {
+        carrito[indiceProducto].unidades--
+
+        if (carrito[indiceProducto].unidades === 0) {
+            carrito.splice(indiceProducto, 1)
+            e.target.parentElement.parentElement.remove()
+         
+        } else {
+            carrito[indiceProducto].subtotal = carrito[indiceProducto].precioUnitario * carrito[indiceProducto].unidades
+        
+            e.target.nextElementSibling.innerText = carrito[indiceProducto].unidades
+            e.target.parentElement.nextElementSibling.innerText = carrito[indiceProducto].subtotal
+        }        
+        guardarEnStorage(carrito)
+    }
+    
+    const total = calcularTotal(carrito)
+    actualizarTotal(total)
+}
+
+function eliminarProductoDelCarrito(e) {
+    let id = Number(e.target.id.substring(3))
+    let carrito = recuperarCarritoDelStorage()
+    let indiceProducto = carrito.findIndex(producto => producto.id === id)
+
+    if (indiceProducto !== -1) {
+        carrito.splice(indiceProducto, 1)
+        let tarjetaCarrito = document.getElementById("tca" + id)
+        tarjetaCarrito.remove()
+    }
+
+    guardarEnStorage(carrito)
+
+    const total = calcularTotal(carrito)
+    actualizarTotal(total)
 }
 
 function verOcultarCarrito(e) {
@@ -140,9 +229,9 @@ function verOcultarCarrito(e) {
     }
 }
 
-function guardarEnStorage(clave, valor) {
+function guardarEnStorage(valor) {
     let valorJson = JSON.stringify(valor)
-    localStorage.setItem(clave, valorJson)
+    localStorage.setItem("carrito", valorJson)
 }
 
 function recuperarCarritoDelStorage () {
