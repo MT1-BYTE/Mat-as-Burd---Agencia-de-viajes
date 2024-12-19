@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./styles.css">
     <title>Agencia de viajes</title>
 </head>
+
 <body>
     <h1 id="titulo">Bienvenidos!</h1>
     <button id="productosCarrito">Carrito</button>
 
     <div id="pantallaProductos">
-        <input id="inputBuscar" placeholder="Búsqueda">
-        <button id="botonBuscar">Buscar</button>
+        <div>
+            <input id="inputBuscar" placeholder="Búsqueda">
+            <button id="botonBuscar">Buscar</button>
+        </div>
+
+        <select name="categorias" id="filtroCategorias">
+            <option value="">Ver todo</option>
+            <option value="vuelo">Vuelo</option>
+            <option value="alojamiento">Alojamiento</option>
+            <option value="paquete">Paquete</option>
+        </select>
+
         <div id="contenedorProductos"></div>
     </div>
     

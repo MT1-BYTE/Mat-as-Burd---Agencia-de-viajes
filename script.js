@@ -30,6 +30,9 @@ function principal() {
     let inputBuscar = document.getElementById("inputBuscar")
     inputBuscar.addEventListener("input", (e) => filtrarYrenderizar(e, productos))
 
+    let filtroCategorias = document.getElementById("filtroCategorias")
+    filtroCategorias.addEventListener("change", (e) => filtrarPorCategoria(e, productos))
+
     let botonesAgregarProductos = document.getElementsByClassName("botonAgregarAlCarrito")
     for (const boton of botonesAgregarProductos) {
         boton.addEventListener("click", (e) => agregarProductoAlCarrito(e, productos))
@@ -44,6 +47,12 @@ function principal() {
 }
 
 principal()
+
+function filtrarPorCategoria(e, productos) {
+    const categoria = e.target.value
+    const productosFiltrados = productos.filter(producto => producto.categoria.includes(categoria))
+    crearTarjetasProductos(productosFiltrados)
+}
 
 function calcularTotal(productos) {
     return productos.reduce((acum, producto) => acum + producto.subtotal, 0)
