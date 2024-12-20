@@ -65,10 +65,36 @@ function actualizarTotal(total) {
 }
 
 function finalizarCompra() {
-    alert("Gracias por su compra")
-    renderizarCarrito([]) 
-    localStorage.removeItem("carrito")
+    // Mostrar alerta de "procesando"
+    Swal.fire({
+      title: "Tu compra está siendo procesada...",
+      html: "Por favor, esperá mientras completamos tu transacción.",
+      timer: 7000,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    }).then(() => {
+      // Mostrar alerta de "pago exitoso"
+      Swal.fire({
+        title: "¡Tu pago fue procesado correctamente!",
+        text: "Enviaremos todos los detalles a tu correo",
+        icon: "success",
+        draggable: true,
+        confirmButtonText: "Finalizar",
+        customClass: {
+          popup: 'swal-custom-popup',
+          title: 'swal-custom-title',
+          confirmButton: 'swal-custom-confirm-button'
+        }
+      }).then(() => {
+        // Limpiar carrito y actualizar localStorage después del pago exitoso
+        renderizarCarrito([]) 
+        localStorage.removeItem("carrito") 
+      })
+    })
 }
+  
 
 function crearTarjetasProductos(productos) {
     let contenedor = document.getElementById("contenedorProductos")
@@ -126,6 +152,8 @@ function agregarProductoAlCarrito(event, productos) {
     guardarEnStorage(carrito)
 
     renderizarCarrito(carrito)
+
+    mostrarNotificacionCarrito(productoOriginal)
 }
 
 function renderizarCarrito(carrito) {
@@ -262,4 +290,35 @@ function filtrar(e, productos) {
     return productosFiltrados = productos.filter(producto => producto.destino.toLowerCase().includes(e.target.value.toLowerCase()) || producto.categoria.toLowerCase().includes(e.target.value.toLowerCase())) 
 }
 
+function mostrarNotificacionCarrito(producto) {
+    let mensaje = "";
+  
+    // Determinar el mensaje según la categoría del producto
+    switch (producto.categoria) {
+      case "vuelo":
+        mensaje = "¡Agregaste un vuelo al carrito!";
+        break;
+      case "alojamiento":
+        mensaje = "¡Agregaste un alojamiento al carrito!";
+        break;
+      case "paquete":
+        mensaje = "¡Agregaste un paquete al carrito!";
+        break;
+      default:
+        mensaje = "¡Agregaste un producto al carrito!";
+    }
+  
+    // Usar Toastify para mostrar la notificación
+    Toastify({
+      text: mensaje, 
+      duration: 3000,
+      close: true, 
+      gravity: "bottom", 
+      position: "right", 
+      stopOnFocus: true, 
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)", 
+      }
+    }).showToast(); 
+}
 
