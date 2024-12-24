@@ -5,11 +5,9 @@ function pedirProductos() {
         .then(response => response.json())
         .then(productos => principal(productos))
         .catch(error => notificacionError(error))
-
 }
 
 function principal(productos) {
-
     let carrito = recuperarCarritoDelStorage("carrito")
     console.log("🚀 ~ principal ~ carrito:", carrito)
 
@@ -35,7 +33,6 @@ function principal(productos) {
 
     let botonComprar = document.getElementById("botonComprar")
     botonComprar.addEventListener("click", finalizarCompra)
-
 }
 
 function filtrarPorCategoria(e, productos) {
@@ -50,8 +47,7 @@ function calcularTotal(productos) {
 
 function actualizarTotal(total) {
     let elementoTotal = document.getElementById("total")
-    elementoTotal.innerText = "$" + total
-    
+    elementoTotal.innerText = "$" + total 
 }
 
 function finalizarCompra() {
@@ -122,7 +118,6 @@ function crearTarjetasProductos(productos) {
 }
 
 function agregarProductoAlCarrito(event, productos) {
-    console.log("🚀 ~ agregarProductoAlCarrito ~ productos:", productos)
     let carrito = recuperarCarritoDelStorage()
     let id = Number(event.target.id.substring(3))
     let productoOriginal = productos.find(producto => producto.id === id)
