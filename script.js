@@ -1,22 +1,14 @@
-function principal() {
-    let productos = [
-        {id: 1, destino: "Uruguay", precio: 500, stock: 20, categoria: "vuelo", rutaImagen: "uruguay.jpg"},
-        {id: 2, destino: "Miami", precio: 800, stock: 4, categoria: "vuelo", rutaImagen: "miami.jpg"},
-        {id: 3, destino: "Bariloche", precio: 400, stock: 1, categoria: "vuelo", rutaImagen: "bariloche.jpg"},
-        {id: 4, destino: "Hotel Resort", precio: 2000, stock: 30, categoria: "alojamiento", rutaImagen: "hotelresort.jpg"},
-        {id: 5, destino: "Hotel Playas", precio: 2500, stock: 10, categoria: "alojamiento", rutaImagen: "hotelplaya.jpg"},
-        {id: 6, destino: "Paquete aventura", precio: 1500, stock: 5, categoria: "paquete", rutaImagen: "paqueteaventura.jpg"},
-        {id: 7, destino: "Paquete relax", precio: 1200, stock: 7, categoria: "paquete", rutaImagen: "paqueterelax.jpg"},
-        {id: 8, destino: "Hotel Montaña", precio: 1800, stock: 25, categoria: "alojamiento", rutaImagen: "hotelmontaña.jpg"},
-        {id: 9, destino: "Santiago de Chile", precio: 600, stock: 8, categoria: "vuelo", rutaImagen: "santiagodechile.jpg"},
-        {id: 10, destino: "Paris", precio: 1500, stock: 2, categoria: "vuelo", rutaImagen: "paris.jpg"},
-        {id: 11, destino: "Paquete Europa", precio: 4500, stock: 3, categoria: "paquete", rutaImagen: "paqueteeuropa.jpg"},
-        {id: 12, destino: "Hotel Mar", precio: 1700, stock: 20, categoria: "alojamiento", rutaImagen: "hotelmar.jpg"},
-        {id: 13, destino: "Buenos Aires", precio: 700, stock: 12, categoria: "vuelo", rutaImagen: "buenosaires.jpg"},
-        {id: 14, destino: "Paquete luna de miel", precio: 3500, stock: 6, categoria: "paquete", rutaImagen: "paqueteluna.jpg"},
-        {id: 15, destino: "Hotel Buenos Aires", precio: 2200, stock: 10, categoria: "alojamiento", rutaImagen: "hotelbuenos.jpg"},
-        {id: 16, destino: "Nueva York", precio: 1200, stock: 3, categoria: "vuelo", rutaImagen: "ny.jpg"}
-    ]
+pedirProductos()
+    
+function pedirProductos() {
+    fetch("./info.json")
+        .then(response => response.json())
+        .then(productos => principal(productos))
+        .catch(error => notificacionError(error))
+
+}
+
+function principal(productos) {
 
     let carrito = recuperarCarritoDelStorage("carrito")
     console.log("🚀 ~ principal ~ carrito:", carrito)
@@ -45,8 +37,6 @@ function principal() {
     botonComprar.addEventListener("click", finalizarCompra)
 
 }
-
-principal()
 
 function filtrarPorCategoria(e, productos) {
     const categoria = e.target.value
@@ -132,6 +122,7 @@ function crearTarjetasProductos(productos) {
 }
 
 function agregarProductoAlCarrito(event, productos) {
+    console.log("🚀 ~ agregarProductoAlCarrito ~ productos:", productos)
     let carrito = recuperarCarritoDelStorage()
     let id = Number(event.target.id.substring(3))
     let productoOriginal = productos.find(producto => producto.id === id)
@@ -322,3 +313,11 @@ function mostrarNotificacionCarrito(producto) {
     }).showToast(); 
 }
 
+function notificacionError(error) {
+    Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Algo salió mal",
+        footer: "Por favor, intente nuevamente en un momento"
+    })
+}
